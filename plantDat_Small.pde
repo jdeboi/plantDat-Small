@@ -13,7 +13,7 @@ void setup() {
   size(1080, 1080, P3D);
   //fullScreen(P3D);
 
-  initScreens();
+  initScreens(1080, 1080);
   initServer();
 
   // plant files
@@ -36,7 +36,7 @@ void setup() {
   // the elements
   initBackground();
   initTerrain();
-  initDrops();
+  initDrops(canvas);
   initCement();
 
   // permanent plants
@@ -65,12 +65,12 @@ void draw() {
 
   if (breaking) {
     //displayGroundTerrainCement(canvas);
-     displayGroundTerrain(canvas);
+
     displayCementBreaking(canvas);
   } else {
     // ground
-   
 
+    displayGroundTerrain(canvas);
 
     // plants
     displayGrass(canvas, grasses);
@@ -96,22 +96,29 @@ void draw() {
 
   //if (TESTING) 
   displayFrames();
+  displayRain();
 }
 
 void update() {
+
   // plants
-  checkForSpawned(1000);
-  grasses.grow();
-  removeDeadPlants();
-  spawnRecurringPlants(1000*15);
+  if (!breaking) {
+    checkForSpawned(1000);
+    grasses.grow();
+    removeDeadPlants();
+    spawnRecurringPlants(1000*15);
+  }
 
   // the elements
   checkThunder();
   checkRain();
-  setWater();
-  //waterOff();
-  setGridTerrain();
-  wind();
+  
+  if (!breaking) {
+    setWater();
+    //waterOff();
+    setGridTerrain();
+    wind();
+  }
   playSounds();
 }
 
@@ -130,11 +137,19 @@ void keyPressed() {
     //saveMappedLines();
   } else if (key == 'l')
     loadKeystone();
-    else if (key =='n') breakingNum++;
+  else if (key =='n') incrementBreaking();
 }
 
 void testingVals() {
   lifeTimeSeconds = 5;
   rainLasts = 10*1000;
   sunLasts = 10*1000;
+}
+
+
+void incrementBreaking() {
+  breakingNum++;
+  if (breakingNum > 4) {
+    breaking = false;
+  }
 }

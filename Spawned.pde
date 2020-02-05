@@ -11,51 +11,9 @@ void initPermPlants() {
   permPlants = new ArrayList<Plant>();
 
   // middle
-  permPlants.add(new Clasping(getSpawnedXY(35, 0), 1.0, false));
-  permPlants.add(new Beauty(getSpawnedXY(36, 3), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(37, 0), 1.0, false));
-
-  permPlants.add(new Lizard(getSpawnedXY(55, 2), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(53, 0), 1.0, false));
-
-  // right side plants
-
-
-  permPlants.add(new Beauty(getSpawnedXY(78, 0), 1.0, false));
-  permPlants.add(new Clasping(getSpawnedXY(79, 3), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(79.5, 1), 1.0, false));
-
-  permPlants.add(new Beauty(getSpawnedXY(92, -10), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(91, -3), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(93, 0), 1.0, false));
-  permPlants.add(new Stokes(getSpawnedXY(95, -20), 1.0, false));
-  permPlants.add(new Clasping(getSpawnedXY(97, -5), 1.0, false));
-  permPlants.add(new Stokes(getSpawnedXY(98, -22), 1.0, false));
-  permPlants.add(new Obedient(getSpawnedXY(100, -12), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(101, -32), 1.0, false));
-  permPlants.add(new Obedient(getSpawnedXY(102, -22), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(103, -12), 1.0, false));
-
-  // left side
-  permPlants.add(new Lizard(getSpawnedXY(-2, -15), 1.0, false));
-  permPlants.add(new Beauty(getSpawnedXY(-1, -35), 1.0, false));
-  permPlants.add(new Beauty(getSpawnedXY(0, -30), 1.0, false));
-  permPlants.add(new Clasping(getSpawnedXY(3, -30), 1.0, false));
-  permPlants.add(new Clasping(getSpawnedXY(2, -20), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(3, 0), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(5, -15), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(6, -25), 1.0, false));
-  permPlants.add(new Stokes(getSpawnedXY(7, -5), 1.0, false));
-  permPlants.add(new Stokes(getSpawnedXY(8, -5), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(9, -30), 1.0, false));
-  permPlants.add(new Beauty(getSpawnedXY(10, -10), 1.0, false));
-
-  permPlants.add(new Lizard(getSpawnedXY(11, -30), 1.0, false));
-  permPlants.add(new Beauty(getSpawnedXY(12, -15), 1.0, false));
-
-  permPlants.add(new Obedient(getSpawnedXY(21, -2), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(20, 0), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(22, 0), 1.0, false));
+  //permPlants.add(new Clasping(getSpawnedXY(35, 0), 1.0, false));
+  //permPlants.add(new Beauty(getSpawnedXY(36, 3), 1.0, false));
+  //permPlants.add(new Lizard(getSpawnedXY(37, 0), 1.0, false));
 }
 
 void displaySpawned(PGraphics s) {
@@ -125,10 +83,7 @@ void requestData() {
     int code = plant.getInt("code");
     if (!spawnedPlantIDs.containsKey(code)) {
       if (breaking) {
-        breakingNum++;
-        if (breakingNum > 4) {
-          breaking = false;
-        }
+        incrementBreaking();
       } else {
         addNewPlant(pObj, code);
       }
@@ -193,9 +148,7 @@ PVector getSpawnedXY(float x, float y) {
   float zMax = -50;
   float newZ = map(y, 0, 100, zMin, zMax);
   float newY =  map(y, 100, 0, canvas.height+10, 100);
-  //float newX = map(x, 0, 100, newZ*.8 + 15, canvas.width-newZ*.8-70);
-  float newX = map(x, 0, 100, newZ + 15, canvas.width-newZ-70);
-  //println("spawned x " + x + "y" + y + " dx " + newX + " dy " + newY + " dz " + newZ);
+  float newX = map(x, 0, 100, newZ*.5, canvas.width-newZ*.5);
   return new PVector(newX, newY, newZ);
 }
 
@@ -215,28 +168,6 @@ PVector getWaterOrigin() {
   return new PVector(x, y, z);
 }
 
-
-
-PVector getWaterLoc(float x, float y, float z) {
-  float zMin = -1799;
-  float zMax = 0;
-  float minX = map(z, zMax, zMin, 22, 8);
-  float maxX = map(z, zMax, zMin, 32, 45);
-  float minY = 0;
-  float maxY = 25;
-
-  float newX = map(x, z*.6 + 15, canvas.width-z*.55-80, minX, maxX);
-  float newY = map(z, zMax, zMin, maxY, minY);
-
-  //float dis = sqrt(y*y + z *z);
-  //float newY = map(dis, 0, rowsTerr*spacingTerr*(3.0/4.0), rowsTerr*(1.0/4), rowsTerr);
-  //newY = constrain(newY, 0, rowsTerr-1);
-
-  //float newX = colsTerr/2 - (x - canvas.width/2)*1.0/spacingTerr; 
-  //newX = constrain(newX, 0, colsTerr-1);
-
-  return new PVector(newX, newY);
-}
 
 void spawnFakePlants() {
   for (int x = 0; x <= 100; x += 25) {
@@ -281,11 +212,6 @@ void displayBoundaries(PGraphics s) {
       s.fill(255, 0, y*100);
       s.translate(temp.x, temp.y, temp.z);
       reduceWater(temp.x, temp.y, temp.z, 1.0);
-      //println("tz" + temp.z);
-      //PVector temp2 = getWaterLoc(temp.x, temp.y, temp.z);
-      //reduceWater(int(temp2.x), int(temp2.y), 1);
-      //reduceWater(int(temp.x), int(temp.y), 1);
-      //println(temp.x + " " + temp.y + " " + temp.z);
       s.ellipse(0, 0, 30, 30);
       s.popMatrix();
     }

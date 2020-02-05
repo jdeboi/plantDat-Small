@@ -112,7 +112,7 @@ int[] getRowCol(int x, int y, int z) {
   int[] rowcol = new int[2];
   rowcol[1] = round(dx / spacingTerr);
   //rowcol[1] = round(map(rowcol[1], 0, colsTerr, 2, colsTerr-3));
-  rowcol[0] = round(dhypo/spacingTerr)-3;
+  rowcol[0] = round(dhypo/spacingTerr);
   return rowcol;
 }
 
@@ -145,6 +145,34 @@ void reduceWater(int x, int y, int z, float plantH) {
     }
   }
 }
+
+
+float waterY = 0;
+void waterOff() {
+  waterY = -150;
+}
+
+void setWater() {
+  incSpawnedFloat();
+  float lowestSea = -150;
+  float maxs = 30;
+
+  // if num spawned should affect water
+  //float maxSea = map(spawnedFloat, 0, MAX_SPAWNED, maxs, -120);
+  //maxSea = constrain(maxSea, -100, maxs);
+  float maxSea = maxs;
+  if (isRaining) {
+
+    waterY = map(millis() - lastRainTime, 0, rainLasts, lowestSea, maxSea);
+    waterY = constrain(waterY, lowestSea, maxSea);
+  } else {
+    if (millis() - lastRainTime >  rainLasts+sunLasts*.3) {
+      waterY = map(millis() - lastRainTime, rainLasts+sunLasts*.3, rainLasts+sunLasts*.7, maxSea, lowestSea);
+      waterY = constrain(waterY, lowestSea, maxSea);
+    }
+  }
+}
+
 
 
 void displayGroundTerrainCement(PGraphics s) {
@@ -241,7 +269,7 @@ color getVertexHeight(float h, color start, color end, int min, int max, int alp
   return newc;
 }
 
-float waterFactor = 7.0/10;
+float waterFactor = 8.0/10;
 
 float getBackWater() {
   return cos(radians(90-globalAngle))*-rowsTerr*spacingTerr*waterFactor;

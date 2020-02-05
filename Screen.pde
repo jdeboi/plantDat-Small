@@ -3,11 +3,11 @@ Keystone ks;
 CornerPinSurface surface;
 boolean isCalibrating = true;
 
-void initScreens() {
+void initScreens(int w, int h) {
   ks = new Keystone(this);
   
-  surface = ks.createQuadPinSurface(width, height, 20);
-  canvas = createGraphics(width, height, P3D);
+  surface = ks.createQuadPinSurface(w, h, 20);
+  canvas = createGraphics(w, h, P3D);
 }
 
 void saveKeystone() {

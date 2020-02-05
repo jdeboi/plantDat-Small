@@ -10,7 +10,7 @@ PShape skyline;
 PShape backhouses;
 
 PImage cement;
-PShape[] concrete;
+PlantFile[] concrete;
 
 
 PImage plants[];
@@ -141,7 +141,7 @@ void initBackground() {
 
   //houses = loadImage("images/houses.png");
 
-  housesSvg = loadShape("images/houses2.svg");
+  housesSvg = loadShape("images/houses4.svg");
   wires = loadShape("images/wires2.svg");
   skyline = loadShape("images/skyline2.svg");
   backhouses = loadShape("images/backhouses2.svg");
@@ -164,7 +164,7 @@ void displayHouse(PGraphics s, int z ) {
 
 
 
-  displayCement(s, down*1.35, z*2-3);
+
 
 
   s.translate(-w*.3, down, z);
@@ -172,9 +172,10 @@ void displayHouse(PGraphics s, int z ) {
 
   s.rotate(radians(0));
   //s.image(houses, 0, 0, w, h);
-  s.translate(-400, -230);
-  float factor = 1.5;
-  s.translate(0, 0, -2);
+  s.translate(-400, -320);
+  float factor = 1.6;
+  s.translate(-80, -20, -2);
+  s.noStroke();
   skyline.disableStyle();
   s.fill(lerpColor(getBackgroundHue(), color(255), .1));
   s.shape(skyline, 0, 0, skyline.width*factor, skyline.height*factor);
@@ -182,9 +183,17 @@ void displayHouse(PGraphics s, int z ) {
   backhouses.disableStyle();
   s.fill(lerpColor(getBackgroundHue(), color(255), .3));
   s.shape(backhouses, 0, 0, backhouses.width*factor, backhouses.height*factor);
+
+
+  s.translate(0, 0, .5);
+  displayCement(s, 0, 0); //down*1.35
+
   s.translate(0, 0, .5);
   s.shape(wires, 0, 0, wires.width*factor, wires.height*factor);
-  s.translate(0, 0, .5);
+
+  s.translate(0, 20, .5);
+  s.noStroke();
+  //housesSvg.enableStyle();
   s.shape(housesSvg, 0, 0, housesSvg.width*factor, housesSvg.height*factor);
 
 
@@ -250,22 +259,28 @@ void checkRain() {
 //}
 
 void displayCement(PGraphics s, float y, int z) {
-  int gradStarts = 450;
+  int gradStarts = 220;
   s.pushMatrix();
-  s.translate(-s.width*2, y, z);
+  s.translate(-s.width*2, y+650, z);
+  displayGradientCement(s, gradStarts, y, z);
+
+  if (breaking) {
+    s.fill(200);
+    s.rect(-s.width, 0, s.width*7, s.height*6);
+  } else s.rect(-s.width, gradStarts, s.width*7, s.height*2);
+  s.popMatrix();
+}
+
+void displayGradientCement(PGraphics s, int gradStarts, float y, int z) {
   s.noStroke();
-  //s.rotateX(radians(90));
-  //s.fill(0);
-  //s.textureWrap(REPEAT);
-  //s.textureMode(NORMAL);
   s.beginShape();
-  //s.texture(cement);
-  s.fill(darkCementColor);
+  color c1 = lerpColor(getBackgroundHue(), color(255), .4);
+  s.fill(lerpColor(cementColor, c1, .7));
   s.vertex(-s.width, 0, 0, 0);
   float inc = 0;
   for (int i = -s.width; i <= s.width*6; i+= 50) {
     //s.fill((i+s.width)*1.0/(s.width*7) * 255);
-    s.vertex(i, noise(inc += 0.05)*150, (i+s.width)*1.0/(s.width*7), 0);
+    s.vertex(i, noise(inc += 0.05)*50, (i+s.width)*1.0/(s.width*7), 0);
   }
   s.fill(cementColor);
   s.vertex(s.width*6, gradStarts, 1, 0);
@@ -273,37 +288,28 @@ void displayCement(PGraphics s, float y, int z) {
   //s.vertex(-s.width, s.height*2, 0, 1);
   s.vertex(-s.width, gradStarts, 0, 0);
   s.endShape();
-  s.rect(-s.width, gradStarts, s.width*7, s.height*4);
-  s.popMatrix();
 }
 
-
-
 void initCement() {
-  concrete = new PShape[4];
-  for (int i = 1; i < 5; i++) {
-    concrete[i-1] = loadShape("images/concrete/concrete" + i + ".svg");
+  concrete = new PlantFile[4];
+
+  float[] scales = {1, 1, 1, 1};
+  boolean[] flipped = {false, false, false, false};
+  float[] rot = {radians(90), radians(90), radians(90), radians(90)};
+  PVector[] snaps = {new PVector(90, 100), new PVector(160, 180), new PVector(200, 300), new PVector(350, 500)};
+  for (int i = 0; i < 4; i++) {
+    concrete[i] = new PlantFile("images/concrete/" + i + ".svg", flipped[i], snaps[i].x, snaps[i].y, scales[i], rot[i]);
   }
 }
 
 void displayCementBreaking(PGraphics s) {
   if (breakingNum > 0 && breakingNum < 5) {
-    s.shape(concrete[breakingNum-1], 0, 0);
+    //s.shape(concrete[breakingNum-1], 0, 0);
+    concrete[breakingNum-1].display(s.width/2, s.height*2.0/3, 0, 1, false, s);
   }
 }
 
 
-Drop[] drops;
-int dropIndex = 0;
-long dropTime = 0;
-long dropSpawnTime = 5;
-
-void initDrops() {
-  drops = new Drop[200];
-  for (int i = 0; i < drops.length; i++) {
-    drops[i] = new Drop();
-  }
-}
 
 boolean getRaining() {
   if (millis() - lastRainTime < rainLasts) {
@@ -312,93 +318,103 @@ boolean getRaining() {
   return false;
 }
 
-void displayRain(PGraphics s) {
-  if (isRaining) {
-    //if (millis() - dropTime > dropSpawnTime) {
-    //  drops[dropIndex].spawn();
-    //  drops[dropIndex+1].spawn();
-    //  drops[dropIndex+2].spawn();
-    //  dropIndex+=3;
-    //  if (dropIndex >= drops.length-3) dropIndex = 0;
-    //  dropTime = millis();
-    //}
-    int amt = 1;
-    if (millis() - lastRainTime > rainLasts *.8) amt = int(map(millis()-lastRainTime, rainLasts*.7, rainLasts, 1, 8));
-    for (int i = 0; i < drops.length; i+=amt) {
-      drops[i].fall(20);
-      drops[i].display(s);
-    }
+
+Drop[] drops = new Drop[150]; // array of drop objects
+
+void initDrops(PGraphics s) {
+  for (int i = 0; i < drops.length; i++) { // we create the drops 
+    drops[i] = new Drop(s);
   }
 }
+
 
 class Drop {
-  int x, y, yMax, len;
+  float x; // x postion of drop
+  float y; // y position of drop
+  float z; // z position of drop , determines whether the drop is far or near
+  float len; // length of the drop
+  float yspeed; // speed of te drop
+  float yMin = 4;
+  float yMax = 15;
 
-  Drop() {
-    x = int(random(width));
-    y = int(random(-1000, 0));
-
-    len = int(random(8, 20));
-    yMax = int(map(len, 8, 20, height*.4, height));
+  //near means closer to the screen , ie the higher the z value ,closer the drop is to the screen.
+  Drop(PGraphics s) {
+    x  = random(s.width); // random x position ie width because anywhere along the width of screen
+    y  = random(-500, -50); // random y position, negative values because drop first begins off screen to give a realistic effect
+    z  = random(0, 20); // z value is to give a perspective view , farther and nearer drops effect
+    len = map(z, 0, 20, 5, 12); // if z is near then  drop is longer
+    yspeed  = map(z, 0, 20, yMin, yMax); // if z is near drop is faster
   }
 
-  void fall(int speed) {
+  void fall(PGraphics s) { // function  to determine the speed and shape of the drop 
+    y = y + yspeed; // increment y position to give the effect of falling 
+    float grav = map(z, 0, 20, 0, 0.2); // if z is near then gravity on drop is more
+    yspeed = yspeed + grav; // speed increases as gravity acts on the drop
 
-    //if (y > -100) y += speed;
-    //if (y > yMax) {
-    //  y = -100;
-    //}
-    if (isRaining) {
-      y += speed;
-      if (y > yMax) {
-        y = -100;
-      }
-    } else {
-      if (y > -20) {
-        y += speed;
-        if (y > yMax) {
-          y = -100;
-        }
-      }
+    if (y > s.height-z*30) { // repositions the drop after it has 'disappeared' from screen
+      y = random(-200, -100);
+      yspeed = map(z, 0, 20, yMin, yMax);
     }
   }
 
-  void spawn() {
-    y = -20;
+  void fall() { // function  to determine the speed and shape of the drop 
+    y = y + yspeed; // increment y position to give the effect of falling 
+    float grav = map(z, 0, 20, 0, 0.2); // if z is near then gravity on drop is more
+    yspeed = yspeed + grav; // speed increases as gravity acts on the drop
+
+    if (y > height) { // repositions the drop after it has 'disappeared' from screen
+      y = random(-200, -100);
+      yspeed = map(z, 0, 20, yMin, yMax);
+    }
   }
 
-  void display(PGraphics s) {
-    s.stroke(200);
-    int sw = int(map(len, 8, 20, 1, 4));
-    s.strokeWeight(sw);
-    s.fill(255);
-    //ellipse(x, y, 100, 100);
-    s.line(x, y, x, y-len);
+  void show(PGraphics s) { // function to render the drop onto the screen
+    float thick = map(z, 0, 20, 1, 3); //if z is near , drop is more thicker 
+    s.strokeWeight(thick); // weight of the drop
+    s.stroke(155); // purple color
+    s.line(x, y, x, y+len); // draws the line with two points
+  }
+
+  void show() { // function to render the drop onto the screen
+    float thick = map(z, 0, 20, 1, 3); //if z is near , drop is more thicker 
+    strokeWeight(thick); // weight of the drop
+    stroke(155); // purple color
+    line(x, y, x, y+len); // draws the line with two points
   }
 }
 
-float waterY = 0;
-void waterOff() {
-  waterY = -150;
-}
-void setWater() {
-  incSpawnedFloat();
-  float lowestSea = -150;
-  float maxs = 200;
 
-  float maxSea = map(spawnedFloat, 0, MAX_SPAWNED, maxs, -120);
-  maxSea = constrain(maxSea, -100, maxs);
+
+void rain(float amt, PGraphics s) {
+  for (int i = 0; i < drops.length; i+= amt) {
+    drops[i].fall(s); // sets the shape and speed of drop
+    drops[i].show(s); // render drop
+  }
+}
+
+void rain(float amt) {
+  for (int i = 0; i < drops.length; i+= amt) {
+    drops[i].fall(); // sets the shape and speed of drop
+    drops[i].show(); // render drop
+  }
+}
+
+void displayRain(PGraphics s) {
   if (isRaining) {
-
-    waterY = map(millis() - lastRainTime, 0, rainLasts, lowestSea, maxSea);
-    waterY = constrain(waterY, lowestSea, maxSea);
-  } else {
-    if (millis() - lastRainTime >  rainLasts+sunLasts*.3) {
-      waterY = map(millis() - lastRainTime, rainLasts+sunLasts*.3, rainLasts+sunLasts*.7, maxSea, lowestSea);
-      waterY = constrain(waterY, lowestSea, maxSea);
-    }
+    float amt = 1;
+    if (millis() - lastRainTime > rainLasts *.8) amt = map(millis()-lastRainTime, rainLasts*.7, rainLasts, 1, 8);
+    rain(amt, s);
   }
 }
+
+void displayRain() {
+  if (isRaining) {
+    float amt = 1;
+    if (millis() - lastRainTime > rainLasts *.8) amt = map(millis()-lastRainTime, rainLasts*.7, rainLasts, 1, 8);
+    rain(amt);
+  }
+}
+
 
 
 void wind() {

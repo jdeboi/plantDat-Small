@@ -41,6 +41,8 @@ public class PlantServer extends WebSocketServer {
   public PlantServer( InetSocketAddress address ) {
     super( address );
   }
+  
+  public void onStart() {};
 
   @Override
     public void onOpen( WebSocket conn, ClientHandshake handshake ) {

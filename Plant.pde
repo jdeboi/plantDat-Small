@@ -238,13 +238,19 @@ public class PlantFile {
   float radRot;
 
   PlantFile(String path, boolean isFlipped, float snapx, float snapy, float sc, float rad) {
-    img = loadShape("plants/" + path);
+   
+    String p = path.substring(0, path.indexOf("/"));
+    if (p.equals("images")) {
+      img = loadShape(path);
+    }
+    else img = loadShape("plants/" + path);
     this.isFlipped = isFlipped;
     this.snapX = int(snapx);
     this.snapY = int(snapy);
     this.sc = sc;
     this.radRot = rad;
   }
+  
 
   void display(float _x, float _y, float _r, float _sc, boolean _isF, PGraphics s) {
     //img.disableStyle();
