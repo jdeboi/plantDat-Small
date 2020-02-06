@@ -83,7 +83,7 @@ void requestData() {
     int code = plant.getInt("code");
     if (!spawnedPlantIDs.containsKey(code)) {
       if (breaking) {
-        incrementBreaking();
+        if (millis()>5000) incrementBreaking();
       } else {
         addNewPlant(pObj, code);
       }
@@ -103,22 +103,38 @@ void addNewPlant(JSONObject pObj, int code) {
   int x = plant.getInt("x");
   int y = plant.getInt("y");
   PVector xy = getSpawnedXY(x, y);
-
-  if (name.equals("Lizard's Tail")) {
+  println("-----------------");
+  println(name);
+  if (name.equals("lizard")) {
     spawnedPlants.add(new Lizard(xy, age, code));
     println("added new plant", name);
-  } else if (name.equals("American Beautyberry")) {
-    println("asd");
+  } else if (name.equals("beauty")) {
     spawnedPlants.add(new Beauty(xy, age, code));
     println("added new plant", name);
-  } else if (name.equals("Clasping Cone Flower")) {
+  } else if (name.equals("clasping")) {
     spawnedPlants.add(new Clasping(xy, age, code));
     println("added new plant", name);
-  } else if (name.equals("Correll’s Obedient Plant")) {
+  } else if (name.equals("obedient")) {
     spawnedPlants.add(new Obedient(xy, age, code));
     println("added new plant", name);
-  } else if (name.equals("Stokes Aster")) {
+  } else if (name.equals("stokes")) {
     spawnedPlants.add(new Stokes(xy, age, code));
+    println("added new plant", name);
+  }
+  else if (name.equals("blueeye")) {
+    spawnedPlants.add(new Blueeye(xy, age, code));
+    println("added new plant", name);
+  } else if (name.equals("rose")) {
+    spawnedPlants.add(new Rose(xy, age, code));
+    println("added new plant", name);
+  } else if (name.equals("frog")) {
+    spawnedPlants.add(new Frog(xy, age, code));
+    println("added new plant", name);
+  } else if (name.equals("sleeping")) {
+    spawnedPlants.add(new Sleeping(xy, age, code));
+    println("added new plant", name);
+  } else if (name.equals("button")) {
+    spawnedPlants.add(new Button(xy, age, code));
     println("added new plant", name);
   }
 

@@ -191,4 +191,5 @@ class ClientLoc {
     s.translate(0, 0, .5);
     s.shape(shovel, 0, 0, shovelW, shovelH);
   }
+  
 }

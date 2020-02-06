@@ -304,7 +304,6 @@ void initCement() {
 
 void displayCementBreaking(PGraphics s) {
   if (breakingNum > 0 && breakingNum < 5) {
-    //s.shape(concrete[breakingNum-1], 0, 0);
     concrete[breakingNum-1].display(s.width/2, s.height*2.0/3, 0, 1, false, s);
   }
 }

@@ -10,8 +10,8 @@ PGraphics canvas;
 
 void setup() {
   //size(1600, 900, P3D);
-  size(1080, 1080, P3D);
-  //fullScreen(P3D);
+  //size(1080, 1080, P3D);
+  fullScreen(P3D);
 
   initScreens(1080, 1080);
   initServer();
@@ -48,6 +48,7 @@ void setup() {
     spawnFakePlants();
     testingVals();
   }
+  loadKeystone();
 
   smooth(4);
 }
@@ -65,8 +66,9 @@ void draw() {
 
   if (breaking) {
     //displayGroundTerrainCement(canvas);
-
+    displayLiveSpawn(canvas);
     displayCementBreaking(canvas);
+    displayRain(canvas);
   } else {
     // ground
 
@@ -94,25 +96,23 @@ void draw() {
   renderScreens();
   update();
 
-  //if (TESTING) 
-  displayFrames();
-  displayRain();
+  if (TESTING) displayFrames();
 }
 
 void update() {
 
   // plants
   if (!breaking) {
-    checkForSpawned(1000);
     grasses.grow();
     removeDeadPlants();
     spawnRecurringPlants(1000*15);
   }
+  checkForSpawned(1000);
 
   // the elements
   checkThunder();
   checkRain();
-  
+
   if (!breaking) {
     setWater();
     //waterOff();
@@ -123,7 +123,7 @@ void update() {
 }
 
 void displayFrames() {
-  fill(0);
+  fill(255);
   stroke(255, 0, 0);
   text(frameRate, 10, 50);
 }
